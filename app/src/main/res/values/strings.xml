@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">نور المرتل</string>
+    <string name="app_tagline">مصحف، تلاوات عالمية، ترتيل بالصوت، ختمة، ومساعد ذكي</string>
+    <string name="sign_in_with_google">تسجيل الدخول عبر Google</string>
+    <string name="auth_welcome_title">مرحباً بك في نور المرتل</string>
+    <string name="auth_welcome_subtitle">سجّل دخولك لحفظ ومزامنة ختمتك، العلامات المرجعية، سجل التسميع الصوتي، والمحادثات القرآنية الذكية عبر جميع أجهزتك.</string>
+    <string name="nav_mushaf">المصحف</string>
+    <string name="nav_reciters">القراء والتحميل</string>
+    <string name="nav_tarteel_khatmah">الختمة والترتيل</string>
+    <string name="nav_ai_companion">المساعد الذكي</string>
+    <string name="nav_prayer_adhkar">الصلاة والأذكار</string>
+</resources>

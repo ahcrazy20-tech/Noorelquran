@@ -1,0 +1,242 @@
+{
+  "entities": {
+    "KhatmahPlan": {
+      "title": "KhatmahPlan",
+      "description": "Tracks a user's Quran completion (Khatmah) plan, daily target, and current reading/recitation progress.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID."
+        },
+        "title": {
+          "type": "string",
+          "description": "Name of the Khatmah plan (e.g., ختمة التدبر الشهرية)."
+        },
+        "targetDays": {
+          "type": "integer",
+          "description": "Target days to complete the 604 pages of the Quran."
+        },
+        "completedPages": {
+          "type": "integer",
+          "description": "Number of Mushaf pages completed so far (0..604)."
+        },
+        "currentSurahNumber": {
+          "type": "integer",
+          "description": "Current Surah number (1..114)."
+        },
+        "currentAyahNumber": {
+          "type": "integer",
+          "description": "Current Ayah number (1..286)."
+        },
+        "recitationMode": {
+          "type": "string",
+          "enum": ["reading", "listening", "shadowing"],
+          "description": "Preferred mode of tracking this Khatmah."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when last updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "title",
+        "targetDays",
+        "completedPages",
+        "currentSurahNumber",
+        "currentAyahNumber",
+        "recitationMode",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "QuranBookmark": {
+      "title": "QuranBookmark",
+      "description": "Stores a user's saved Ayah bookmark and personal reflection note.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID."
+        },
+        "surahNumber": {
+          "type": "integer",
+          "description": "Surah number (1..114)."
+        },
+        "surahName": {
+          "type": "string",
+          "description": "Arabic Surah name."
+        },
+        "ayahNumber": {
+          "type": "integer",
+          "description": "Ayah number within the Surah (1..286)."
+        },
+        "pageNumber": {
+          "type": "integer",
+          "description": "Mushaf page number (1..604)."
+        },
+        "ayahSnippet": {
+          "type": "string",
+          "description": "Uthmani text of the bookmarked Ayah."
+        },
+        "note": {
+          "type": "string",
+          "description": "Personal reflection or memorization note."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "surahNumber",
+        "surahName",
+        "ayahNumber",
+        "pageNumber",
+        "ayahSnippet",
+        "note",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "RecitationSession": {
+      "title": "RecitationSession",
+      "description": "Logs a voice recitation, Tarteel-style live tracking, or Sheikh shadowing session.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID."
+        },
+        "surahNumber": {
+          "type": "integer",
+          "description": "Surah number practiced (1..114)."
+        },
+        "surahName": {
+          "type": "string",
+          "description": "Arabic Surah name."
+        },
+        "fromAyah": {
+          "type": "integer",
+          "description": "Starting Ayah number."
+        },
+        "toAyah": {
+          "type": "integer",
+          "description": "Ending Ayah number."
+        },
+        "accuracyScore": {
+          "type": "integer",
+          "description": "Voice matching accuracy percentage (0..100)."
+        },
+        "mode": {
+          "type": "string",
+          "description": "Session mode label."
+        },
+        "reciterName": {
+          "type": "string",
+          "description": "Selected Sheikh reciter name."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "surahNumber",
+        "surahName",
+        "fromAyah",
+        "toAyah",
+        "accuracyScore",
+        "mode",
+        "reciterName",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "AdhkarLog": {
+      "title": "AdhkarLog",
+      "description": "Tracks completed daily Adhkar and Tasbeeh counts.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Authenticated owner UID."
+        },
+        "category": {
+          "type": "string",
+          "description": "Adhkar category (e.g., أذكار الصباح, أذكار المساء)."
+        },
+        "zekrTitle": {
+          "type": "string",
+          "description": "Title or text of the completed Zekr."
+        },
+        "completedCount": {
+          "type": "integer",
+          "description": "Count completed by the user."
+        },
+        "targetCount": {
+          "type": "integer",
+          "description": "Recommended target count."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when created (FieldValue.serverTimestamp())."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when updated (FieldValue.serverTimestamp())."
+        }
+      },
+      "required": [
+        "userId",
+        "category",
+        "zekrTitle",
+        "completedCount",
+        "targetCount",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/khatmah_plans/{planId}": {
+      "schema": { "$ref": "#/entities/KhatmahPlan" },
+      "description": "User-scoped Khatmah plans and progress tracking."
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/QuranBookmark" },
+      "description": "User-scoped Quran Ayah and Mushaf page bookmarks with reflections."
+    },
+    "/users/{userId}/recitation_sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/RecitationSession" },
+      "description": "User-scoped voice recitation and Sheikh shadowing session logs."
+    },
+    "/users/{userId}/adhkar_logs/{logId}": {
+      "schema": { "$ref": "#/entities/AdhkarLog" },
+      "description": "User-scoped daily Adhkar and Tasbeeh completion logs."
+    }
+  }
+}

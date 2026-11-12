@@ -1,0 +1,175 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidKhatmahPlan(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'title', 'targetDays', 'completedPages',
+               'currentSurahNumber', 'currentAyahNumber', 'recitationMode',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'title', 'targetDays', 'completedPages',
+               'currentSurahNumber', 'currentAyahNumber', 'recitationMode',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 100 &&
+             data.targetDays is int && data.targetDays >= 1 && data.targetDays <= 365 &&
+             data.completedPages is int && data.completedPages >= 0 && data.completedPages <= 604 &&
+             data.currentSurahNumber is int && data.currentSurahNumber >= 1 && data.currentSurahNumber <= 114 &&
+             data.currentAyahNumber is int && data.currentAyahNumber >= 1 && data.currentAyahNumber <= 286 &&
+             data.recitationMode is string && data.recitationMode in ['reading', 'listening', 'shadowing'] &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidQuranBookmark(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'surahNumber', 'surahName', 'ayahNumber',
+               'pageNumber', 'ayahSnippet', 'note', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'surahNumber', 'surahName', 'ayahNumber',
+               'pageNumber', 'ayahSnippet', 'note', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.surahNumber is int && data.surahNumber >= 1 && data.surahNumber <= 114 &&
+             data.surahName is string && data.surahName.size() >= 1 && data.surahName.size() <= 80 &&
+             data.ayahNumber is int && data.ayahNumber >= 1 && data.ayahNumber <= 286 &&
+             data.pageNumber is int && data.pageNumber >= 1 && data.pageNumber <= 604 &&
+             data.ayahSnippet is string && data.ayahSnippet.size() >= 1 && data.ayahSnippet.size() <= 1000 &&
+             data.note is string && data.note.size() <= 500 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidRecitationSession(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'surahNumber', 'surahName', 'fromAyah',
+               'toAyah', 'accuracyScore', 'mode', 'reciterName',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'surahNumber', 'surahName', 'fromAyah',
+               'toAyah', 'accuracyScore', 'mode', 'reciterName',
+               'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.surahNumber is int && data.surahNumber >= 1 && data.surahNumber <= 114 &&
+             data.surahName is string && data.surahName.size() >= 1 && data.surahName.size() <= 80 &&
+             data.fromAyah is int && data.fromAyah >= 1 && data.fromAyah <= 286 &&
+             data.toAyah is int && data.toAyah >= data.fromAyah && data.toAyah <= 286 &&
+             data.accuracyScore is int && data.accuracyScore >= 0 && data.accuracyScore <= 100 &&
+             data.mode is string && data.mode.size() >= 1 && data.mode.size() <= 40 &&
+             data.reciterName is string && data.reciterName.size() >= 1 && data.reciterName.size() <= 100 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    function isValidAdhkarLog(data, userId) {
+      return data.keys().hasAll([
+               'userId', 'category', 'zekrTitle', 'completedCount',
+               'targetCount', 'createdAt', 'updatedAt'
+             ]) &&
+             data.keys().hasOnly([
+               'userId', 'category', 'zekrTitle', 'completedCount',
+               'targetCount', 'createdAt', 'updatedAt'
+             ]) &&
+             data.userId is string && data.userId == userId && data.userId == request.auth.uid &&
+             data.category is string && data.category.size() >= 1 && data.category.size() <= 80 &&
+             data.zekrTitle is string && data.zekrTitle.size() >= 1 && data.zekrTitle.size() <= 200 &&
+             data.completedCount is int && data.completedCount >= 1 && data.completedCount <= 10000 &&
+             data.targetCount is int && data.targetCount >= 1 && data.targetCount <= 10000 &&
+             data.createdAt is timestamp && data.createdAt <= request.time &&
+             data.updatedAt is timestamp && data.updatedAt <= request.time;
+    }
+
+    match /users/{userId} {
+      match /khatmah_plans/{planId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(planId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(planId) &&
+                         isValidKhatmahPlan(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(planId) &&
+                         isValidKhatmahPlan(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'title', 'targetDays', 'completedPages',
+                           'currentSurahNumber', 'currentAyahNumber',
+                           'recitationMode', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(planId);
+      }
+
+      match /bookmarks/{bookmarkId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(bookmarkId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(bookmarkId) &&
+                         isValidQuranBookmark(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(bookmarkId) &&
+                         isValidQuranBookmark(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'note', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(bookmarkId);
+      }
+
+      match /recitation_sessions/{sessionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(sessionId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) &&
+                         isValidRecitationSession(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(sessionId) &&
+                         isValidRecitationSession(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'accuracyScore', 'toAyah', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(sessionId);
+      }
+
+      match /adhkar_logs/{logId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(logId);
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(logId) &&
+                         isValidAdhkarLog(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(logId) &&
+                         isValidAdhkarLog(incoming(), userId) &&
+                         incoming().userId == existing().userId &&
+                         incoming().createdAt == existing().createdAt &&
+                         incoming().diff(existing()).affectedKeys().hasOnly([
+                           'completedCount', 'updatedAt'
+                         ]);
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(logId);
+      }
+    }
+  }
+}
